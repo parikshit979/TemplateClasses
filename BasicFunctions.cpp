@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <stdexcept>
+#include <vector>
+#include <cmath>
 
 using namespace std;
 
@@ -10,22 +12,34 @@ class Functions
     private:
         T MOD;
         double precistion_num;
-        int MAX;
+        int MAX_SIZE;
+        int MAX_ELEMENT;
+
         long long *catalan;
+        int *filler;
+
     public:
-        Functions(T _mod, T _precistion_num, int _maxSize)
+        Functions(T _mod, T _precistion_num, int _maxSize, int _maxElements)
         {
             MOD = _mod;
             precistion_num = _precistion_num;
-            MAX = _maxSize;
-            catalan = new long long [MAX];
+            MAX_SIZE = _maxSize;
+            MAX_ELEMENT = _maxElements;
+
+            catalan = new long long [MAX_SIZE];
+            filler = new int[MAX_ELEMENT];
+            prime.clear();
         }
+
+        vector<int> prime;
 
         T power(T, T);
         T squareRoot(T);
 
         void calculateCatalanNumbers(int num);
         long long getCatalanNumbers(int index){ return catalan[index]; }
+
+        void EratosthenesSieve();
 };
 
 template <class T>
@@ -70,14 +84,33 @@ void Functions<T>::calculateCatalanNumbers(int num) {
     }
 }
 
+template <class T>
+void Functions<T>::EratosthenesSieve()
+{
+    for ( int i = 2; i < sqrt(MAX_ELEMENT); i++) {
+		if( filler[i] == 0) {
+			for ( int j = i; j*i <= MAX_ELEMENT; j++) filler[i*j] = 1;
+		}
+	}
+	for ( int i = 2; i < MAX_ELEMENT; i++) {
+		if( filler[i] == 0) {
+			prime.push_back(i);
+        }
+    }
+}
+
 int main()
 {
-    Functions<long long> func_longlong(1000000007, 0.00000001, 350);
+    Functions<long long> func_longlong(1000000007, 0.00000001, 350, 10001);
     cout<<func_longlong.power(2,4)<<"\n";
+
     func_longlong.calculateCatalanNumbers(12);
     cout<<func_longlong.getCatalanNumbers(5)<<"\n";
 
-    Functions<double> func_double(1000000007, 0.00000001, 350);
+    func_longlong.EratosthenesSieve();
+    cout<<func_longlong.prime[4]<<"\n";
+
+    Functions<double> func_double(1000000007, 0.00000001, 350, 10001);
     cout<<func_double.squareRoot(17)<<"\n";
 
 
